@@ -1,8 +1,12 @@
 from codecs import decode
-import sys
-import gen_funcs as gen
-import os
 import csv
+import itertools
+import os
+import sys
+import shlex
+
+import gen_funcs as gen
+
 
 USAGE_HEADER = "USAGE:\n"\
                "<arg> = required\n"\
@@ -28,6 +32,7 @@ USAGE_CUSTOM = "Custom: dataGen.py -o <quantity> <\"path to config file\">"
 FULL_USAGE = [USAGE_HEADER, USAGE_DATES, USAGE_INTS , USAGE_FLOAT, USAGE_NAMES, USAGE_DICE , USAGE_COIN , USAGE_CARD,
               USAGE_EMAIL, USAGE_ADDR, USAGE_PHONE, USAGE_USER]
 
+
 def print_full_usage():
     for msg in FULL_USAGE:
         print(msg)
@@ -49,14 +54,14 @@ def parse_args(args, called_from_custom=False):
         return -1
 
     if called_from_custom:
-        return FUNCS[args[1]](args)
+        return FUNCS[args[1]](args[2:len(args)])
     else:
         out = FUNCS[args[1]](args[2:len(args)])
         if isinstance(out, int):
             sys.exit(-1)
         for i in out:
             print(i)
-            sys.exit(0)
+        sys.exit(0)
 
 
 def vet_dates(args):
@@ -381,6 +386,7 @@ def vet_user(args):
 
 
 def vet_custom(args):
+    '''FIND A WAY TO SYNC NAMES WITH EMAILS'''
     if len(args) != 2:
         print(USAGE_CUSTOM)
         return -1
@@ -399,24 +405,39 @@ def vet_custom(args):
         return -1
     try:
         with open(args[1], 'r') as file:
-            data = file.read()
-            data = data.split('\n')
-            if data[-1] == '':
-                data.pop()
+            cmds = file.read()
+            cmds = cmds.split('\n')
+            if cmds[-1] == '':
+                cmds.pop()
     except PermissionError:
         print("Custom: Cannot open file")
         return -1
     except OSError:
         print("Custom: Cannot open file")
         return -1
-    args_lyst = [d.split(" ")[2:len(d)] for d in data]
-    print(args_lyst)
-    out = [parse_args(in_args, True) for in_args in args_lyst]
-
-    if -1 in out:
+    # Split the arguments as the shell would
+    args_lyst = [shlex.split(c) for c in cmds]
+    # Get the results
+    data = [parse_args(in_args, True) for in_args in args_lyst]
+    if -1 in data:
+        print(data)
         return -1
-    else:
-        return out
+    # Make all lists the same size
+    try:
+        data = [d[0:quantity] if len(d) >= quantity else -1 for d in data]
+    except TypeError:
+        print("Custom: All data sets must have the same size. Check config file.")
+        return -1
+    # Combine all the lists
+    try:
+        # print(data)
+        out = list(itertools.zip_longest(*data))
+    except TypeError as e:
+        print(e)
+        return -1
+    print(out)
+
+    return out
 
 FUNCS = {'-d': vet_dates, '-i': vet_ints, '-f': vet_floats, '-n': vet_names, '-r': vet_dice, '-t': vet_coin,
          '-c': vet_card, '-e': vet_emails, '-a': vet_addrs, '-p': vet_phone, '-u': vet_user, '-o': vet_custom}

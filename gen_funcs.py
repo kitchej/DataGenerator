@@ -161,6 +161,7 @@ def gen_emails(names_bank:list)->list:
     '''
     This function went from 69 lines of code to 27 lines of code. That's a 60% decrease!
     '''
+    print(names_bank)
     if len(names_bank) == 0:
         raise ValueError("Names bank cannot be empty")
     out = []
