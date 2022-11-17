@@ -71,7 +71,9 @@ def parse_args(args, called_from_custom=False):
         out = FUNCS[args[1]](args[2:len(args)])
         if isinstance(out, int):
             sys.exit(-1)
-        print(','.join(str(item) for item in out))
+        # print(','.join(str(item) for item in out)) for true csv
+        for i in out:
+            print(i)
         sys.exit(0)
 
 
@@ -93,16 +95,19 @@ def vet_dates(args):
     if '%' not in args[1]:
         print("Dates: Invalid format string", file=sys.stderr)
         return -1
-    try:
-        year_start = int(args[2])
-    except ValueError:
-        print("Dates: Invalid year start", file=sys.stderr)
-        return -1
+    if len(args) == 4:
+        try:
+            year_start = int(args[2])
+        except ValueError:
+            print("Dates: Invalid year start", file=sys.stderr)
+            return -1
+    else:
+        year_start = 1900
     if len(args) == 4:
         try:
             year_end = int(args[3])
         except ValueError:
-            print('Dates: Invalid year end')
+            print('Dates: Invalid year end', file=sys.stderr)
             return -1
     else:
         year_end = 2022
