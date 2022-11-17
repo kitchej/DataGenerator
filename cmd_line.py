@@ -71,8 +71,7 @@ def parse_args(args, called_from_custom=False):
         out = FUNCS[args[1]](args[2:len(args)])
         if isinstance(out, int):
             sys.exit(-1)
-        for i in out:
-            print(i)
+        print(','.join(str(item) for item in out))
         sys.exit(0)
 
 
@@ -144,7 +143,7 @@ def vet_ints(args):
 
 def vet_floats(args):
     if not 2 < len(args) < 5:
-        print(USAGE_INTS)
+        print(USAGE_FLOATS)
         return -1
     try:
         quantity = int(args[0])
@@ -170,7 +169,7 @@ def vet_floats(args):
         except ValueError:
             print("Floats: Invalid value for number of digits", file=sys.stderr)
             return -1
-        if ndigtis <= 0:
+        if ndigits <= 0:
             print("Floats: Invalid value for number of digits", file=sys.stderr)
             return -1
     else:
@@ -387,7 +386,6 @@ def vet_user(args):
 
 
 def vet_custom(args):
-    '''FIND A WAY TO SYNC NAMES WITH EMAILS'''
     if not 1 < len(args) < 4:
         print(USAGE_CUSTOM)
         return -1
