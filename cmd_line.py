@@ -27,7 +27,7 @@ USAGE_ADDR = "Addresses: dataGen.py -a <quantity> <option>\n"\
              "\tADDRESSES OPTIONS: \"street\", \"full\""
 USAGE_PHONE = "Phone numbers: dataGen.py -p <quantity>"
 USAGE_USER = "User Data: dataGen.py -u <quantity> <\"path to a data bank\"(should be in csv format)> <allow duplicates> [csv delimiter {','}]"
-USAGE_CUSTOM = "Custom: dataGen.py -o <quantity> <\"path to config file\">"
+USAGE_CUSTOM = "Custom: dataGen.py -o <quantity> <\"path to config file\"> [output delimiter: ',']"
 
 FULL_USAGE = [USAGE_HEADER, USAGE_DATES, USAGE_INTS , USAGE_FLOAT, USAGE_NAMES, USAGE_DICE , USAGE_COIN , USAGE_CARD,
               USAGE_EMAIL, USAGE_ADDR, USAGE_PHONE, USAGE_USER]
@@ -38,11 +38,23 @@ def print_full_usage():
         print(msg)
 
 
+def read_in(path: str) -> str:
+    try:
+        with open(path, 'r', encoding='utf') as file:
+            return file.read()
+    except PermissionError:
+        return ""
+    except OSError:
+        return ""
+
+
 def parse_args(args, called_from_custom=False):
     accepted_options = 'difnrtceapuo'
     if args[1].lower() == "help":
         print_full_usage()
         return -1
+    if args[1].lower() == "-rf":
+        return vet_read_file(args[2:len(args)])
     if len(args[1]) != 2:
         print_full_usage()
         return -1
@@ -71,21 +83,21 @@ def vet_dates(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Dates: Invalid value for quantity")
+        print("Dates: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Dates: Invalid value for quantity")
+        print("Dates: Invalid value for quantity", file=sys.stderr)
         return -1
     if len(args[1]) > 32:
-        print("Dates: Format string is too long")
+        print("Dates: Format string is too long", file=sys.stderr)
         return -1
     if '%' not in args[1]:
-        print("Dates: Invalid format string")
+        print("Dates: Invalid format string", file=sys.stderr)
         return -1
     try:
         year_start = int(args[2])
     except ValueError:
-        print("Dates: Invalid year start")
+        print("Dates: Invalid year start", file=sys.stderr)
         return -1
     if len(args) == 4:
         try:
@@ -98,7 +110,7 @@ def vet_dates(args):
     try:
         return gen.gen_dates(quantity, args[1], year_start, year_end)
     except ValueError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 def vet_ints(args):
@@ -108,25 +120,25 @@ def vet_ints(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Ints: Invalid value for quantity")
+        print("Ints: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Ints: Invalid value for quantity")
+        print("Ints: Invalid value for quantity", file=sys.stderr)
         return -1
     try:
         start = int(args[1])
     except ValueError:
-        print("Ints: Invalid value for start")
+        print("Ints: Invalid value for start", file=sys.stderr)
         return -1
     try:
         end = int(args[2])
     except ValueError:
-        print("Ints: Invalid value for end")
+        print("Ints: Invalid value for end", file=sys.stderr)
         return -1
     try:
         return gen.gen_ints(quantity, start, end)
     except gen.RangeError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
@@ -137,36 +149,36 @@ def vet_floats(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Floats: Invalid value for quantity")
+        print("Floats: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Floats: Invalid value for quantity")
+        print("Floats: Invalid value for quantity", file=sys.stderr)
         return -1
     try:
         start = float(args[1])
     except ValueError:
-        print("Floats: Invalid value for start")
+        print("Floats: Invalid value for start", file=sys.stderr)
         return -1
     try:
         end = float(args[2])
     except ValueError:
-        print("Floats: Invalid value for end")
+        print("Floats: Invalid value for end", file=sys.stderr)
         return -1
     if len(args) == 4:
         try:
             ndigits = int(args[3])
         except ValueError:
-            print("Floats: Invalid value for number of digits")
+            print("Floats: Invalid value for number of digits", file=sys.stderr)
             return -1
         if ndigtis <= 0:
-            print("Floats: Invalid value for number of digits")
+            print("Floats: Invalid value for number of digits", file=sys.stderr)
             return -1
     else:
         ndigits = 1
     try:
         return gen.gen_floats(quantity, start, end, ndigits)
     except gen.RangeError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
@@ -177,18 +189,18 @@ def vet_names(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Names: Invalid value for quantity")
+        print("Names: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Names: Invalid value for quantity")
+        print("Names: Invalid value for quantity", file=sys.stderr)
         return -1
     if len(args[1]) > 10:
-        print("Names: Invalid value for option")
+        print("Names: Invalid value for option", file=sys.stderr)
         return -1
     try:
         return gen.gen_names(quantity, args[1])
     except ValueError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
@@ -199,18 +211,18 @@ def vet_dice(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Dice Rolls: Invalid value for quantity")
+        print("Dice Rolls: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Dice: Invalid value for quantity")
+        print("Dice: Invalid value for quantity", file=sys.stderr)
         return -1
     try:
         ndice = int(args[1])
     except ValueError:
-        print("Dice Rolls: Invalid value for number of dice")
+        print("Dice Rolls: Invalid value for number of dice", file=sys.stderr)
         return -1
     if ndice <= 0:
-        print("Dice Rolls: Invalid value for number of dice")
+        print("Dice Rolls: Invalid value for number of dice", file=sys.stderr)
         return -1
 
     return gen.gen_dice_rolls(quantity, ndice)
@@ -223,10 +235,10 @@ def vet_coin(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Coin Tosses: Invalid value for quantity")
+        print("Coin Tosses: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Coin Tosses: Invalid value for quantity")
+        print("Coin Tosses: Invalid value for quantity", file=sys.stderr)
         return -1
     return gen.gen_coin_tosses(quantity)
 
@@ -238,19 +250,19 @@ def vet_card(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Card Draws: Invalid value for quantity")
+        print("Card Draws: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Card Draws: Invalid value for quantity")
+        print("Card Draws: Invalid value for quantity", file=sys.stderr)
         return -1
     if len(args) >= 2:
         try:
             number_of_decks = int(args[1])
         except ValueError:
-            print("Card Draws: Invalid value for number of decks")
+            print("Card Draws: Invalid value for number of decks", file=sys.stderr)
             return -1
         if number_of_decks <= 0:
-            print("Card Draws: Invalid value for number of decks")
+            print("Card Draws: Invalid value for number of decks", file=sys.stderr)
             return -1
     else:
         number_of_decks = 0
@@ -261,7 +273,7 @@ def vet_card(args):
         elif discard == "false" or discard == "0":
             discard = False
         else:
-            print("Card Draws: Invalid value for discard drawn cards")
+            print("Card Draws: Invalid value for discard drawn cards", file=sys.stderr)
             return -1
     else:
         discard = True
@@ -273,32 +285,25 @@ def vet_emails(args):
         print(USAGE_EMAIL)
         return -1
     if not os.path.exists(args[0]):
-        print(f"Emails: {args[0]} does not exist")
+        print(f"Emails: {args[0]} does not exist", file=sys.stderr)
         return -1
     if os.path.isdir(args[0]):
-        print(f"Emails: {args[0]} is a directory")
+        print(f"Emails: {args[0]} is a directory", file=sys.stderr)
         return -1
-
-    try:
-        with open(args[0], 'r', encoding='utf') as file:
-            names = file.read()
-            if len(args) == 2:
-                names = names.split(decode(args[1], 'unicode_escape'))
-            else:
-                names = names.split(',')
-            if names[-1] == '':
-                names.pop()
-    except PermissionError:
-        print("Emails: Cannot open file")
+    names = read_in(args[0])
+    if names == "":
+        print("Emails: Cannot open file", file=sys.stderr)
         return -1
-    except OSError:
-        print("Emails: Cannot open file")
-        return -1
-
+    if len(args) == 2:
+        names = names.split(decode(args[1], 'unicode_escape'))
+    else:
+        names = names.split(',')
+    if names[-1] == '':
+        names.pop()
     try:
         return gen.gen_emails(names)
     except ValueError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
@@ -309,17 +314,17 @@ def vet_addrs(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Addresses: Invalid value for quantity")
+        print("Addresses: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Addresses: Invalid value for quantity")
+        print("Addresses: Invalid value for quantity", file=sys.stderr)
     if len(args[1]) > 6:
-        print("Addresses: Invalid value for option")
+        print("Addresses: Invalid value for option", file=sys.stderr)
         return -1
     try:
         return gen.gen_addrs(quantity, args[1])
     except ValueError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
@@ -331,10 +336,10 @@ def vet_phone(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Phone Numbers: Invalid value for quantity")
+        print("Phone Numbers: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Phone Numbers: Invalid value for quantity")
+        print("Phone Numbers: Invalid value for quantity", file=sys.stderr)
     return gen.gen_phone_num(quantity)
 
 
@@ -345,15 +350,15 @@ def vet_user(args):
     try:
         quantity = int(args[0])
     except ValueError:
-        print("User Data: Invalid value for quantity")
+        print("User Data: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("User Data: Invalid value for quantity")
+        print("User Data: Invalid value for quantity", file=sys.stderr)
     if not os.path.exists(args[1]):
-        print(f"User Data: {args[1]} does not exist")
+        print(f"User Data: {args[1]} does not exist", file=sys.stderr)
         return -1
     if os.path.isdir(args[1]):
-        print(f"User Data: {args[1]} is a directory")
+        print(f"User Data: {args[1]} is a directory", file=sys.stderr)
         return -1
     allow_dupes = args[2].lower()
     if allow_dupes == "true" or allow_dupes == "1":
@@ -361,83 +366,112 @@ def vet_user(args):
     elif allow_dupes == "false" or allow_dupes == "0":
         allow_dupes = False
     else:
-        print("User Data: Invalid value for allow duplicates")
+        print("User Data: Invalid value for allow duplicates", file=sys.stderr)
         return -1
-    try:
-        with open(args[1], 'r', encoding='utf') as file:
-            data = file.read()
-            if len(args) == 4:
-                data = data.split(decode(args[3], 'unicode_escape'))
-            else:
-                data = data.split(',')
-            if data[-1] == '':
-                data.pop()
-    except PermissionError:
-        print("User Data: Cannot open file")
+    data = read_in(args[1])
+    if data == "":
+        print("User Data: Cannot open file", file=sys.stderr)
         return -1
-    except OSError:
-        print("User Data: Cannot open file")
-        return -1
+    if len(args) == 4:
+        data = data.split(decode(args[3], 'unicode_escape'))
+    else:
+        data = data.split(',')
+    if data[-1] == '':
+        data.pop()
+
     try:
         return gen.gen_user_data(quantity, data, allow_dupes)
     except ValueError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
 
 
 def vet_custom(args):
     '''FIND A WAY TO SYNC NAMES WITH EMAILS'''
-    if len(args) != 2:
+    if not 1 < len(args) < 4:
         print(USAGE_CUSTOM)
         return -1
     try:
         quantity = int(args[0])
     except ValueError:
-        print("Custom: Invalid value for quantity")
+        print("Custom: Invalid value for quantity", file=sys.stderr)
         return -1
     if quantity <= 0:
-        print("Custom: Invalid value for quantity")
+        print("Custom: Invalid value for quantity", file=sys.stderr)
     if not os.path.exists(args[1]):
-        print(f"Custom: {args[1]} does not exist")
+        print(f"Custom: {args[1]} does not exist", file=sys.stderr)
         return -1
     if os.path.isdir(args[1]):
-        print(f"Custom: {args[1]} is a directory")
+        print(f"Custom: {args[1]} is a directory", file=sys.stderr)
         return -1
-    try:
-        with open(args[1], 'r') as file:
-            cmds = file.read()
-            cmds = cmds.split('\n')
-            if cmds[-1] == '':
-                cmds.pop()
-    except PermissionError:
-        print("Custom: Cannot open file")
-        return -1
-    except OSError:
-        print("Custom: Cannot open file")
-        return -1
+    if len(args) == 3:
+        if len(args[2]) > 1:
+            print(f"Custom: Invalid output delimiter", file=sys.stderr)
+            return -1
+        delim = decode(args[2], 'unicode_escape')
+    else:
+        delim = ','
+
+    cmds = read_in(args[1])
+    cmds = cmds.split('\n')
+    if cmds[-1] == '':
+        cmds.pop()
+
     # Split the arguments as the shell would
     args_lyst = [shlex.split(c) for c in cmds]
     # Get the results
     data = [parse_args(in_args, True) for in_args in args_lyst]
     if -1 in data:
-        print(data)
+        print(f"Issue on line {data.index(-1) + 1} in custom config file.", file=sys.stderr)
         return -1
     # Make all lists the same size
     try:
         data = [d[0:quantity] if len(d) >= quantity else -1 for d in data]
     except TypeError:
-        print("Custom: All data sets must have the same size. Check config file.")
+        print("Custom: All data sets must have the same size. Check config file.", file=sys.stderr)
         return -1
     # Combine all the lists
     try:
-        # print(data)
-        out = list(itertools.zip_longest(*data))
+        result = list(itertools.zip_longest(*data))
     except TypeError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return -1
-    print(out)
-
+    out = []
+    string = ""
+    for row in result:
+        for col in row:
+            if string != "":
+                string = f"{string}{delim}{col}"
+            else:
+                string = col
+        out.append(string)
+        string = ""
     return out
+
+def vet_read_file(args):
+    if not 1 < len(args) < 4:
+        print("READ FILE: dataGen.py -rf <quantity> <\"Path to file\"> [csv delimiter: {','}]", file=sys.stderr)
+        return -1
+    try:
+        quantity = int(args[0])
+    except ValueError:
+        print("READ FILE: Invalid value for quantity", file=sys.stderr)
+        return -1
+    if quantity <= 0:
+        print("READ FILE: Invalid value for quantity", file=sys.stderr)
+    if not os.path.exists(args[1]):
+        print(f"READ FILE: {args[1]} does not exist", file=sys.stderr)
+        return -1
+    if os.path.isdir(args[1]):
+        print(f"READ FILE: {args[1]} is a directory", file=sys.stderr)
+        return -1
+    data = read_in(args[1])
+    if len(args) == 3:
+        delim = decode(args[2], 'unicode_escape')
+    else:
+        delim = ','
+    data = data.split(delim)
+    return data if data[-1] != "" else data.pop()
 
 FUNCS = {'-d': vet_dates, '-i': vet_ints, '-f': vet_floats, '-n': vet_names, '-r': vet_dice, '-t': vet_coin,
          '-c': vet_card, '-e': vet_emails, '-a': vet_addrs, '-p': vet_phone, '-u': vet_user, '-o': vet_custom}
