@@ -22,15 +22,15 @@ USAGE_NAMES = "Names: dataGen.py -n <quantity> <option>\n"\
 USAGE_DICE = "Dice Rolls: dataGen.py -r <quantity> <number of dice>"
 USAGE_COIN = "Coin Tosses: dataGen.py -t <quantity>"
 USAGE_CARD = "Card Draws: dataGen.py -c <quantity> [number of decks: {1}] [discard drawn cards: {true}]"
-USAGE_EMAIL = "Emails: dataGen.py -e <\"file path to a bank of names\"(should be in csv format)> [csv delimiter: {","}]"
+USAGE_EMAIL = "Emails: dataGen.py -e <\"file path to a bank of names\"(should be in csv format)> [csv delimiter: {','}]"
 USAGE_ADDR = "Addresses: dataGen.py -a <quantity> <option>\n"\
              "\tADDRESSES OPTIONS: \"street\", \"full\""
-USAGE_PHONE = "Phone numbers: dataGen.py -p <quantity>"
-USAGE_USER = "User Data: dataGen.py -u <quantity> <\"path to a data bank\"(should be in csv format)> <allow duplicates> [csv delimiter {','}]"
+USAGE_PHONE = "Phone numbers: dataGen.py -p <quantity>\n"
+USAGE_USER = "User Data: dataGen.py -u <quantity> <\"path to a data bank\"(should be in csv format)> <allow duplicates> [csv delimiter {','}]\n"
 USAGE_CUSTOM = "Custom: dataGen.py -o <quantity> <\"path to config file\"> [output delimiter: ',']"
 
 FULL_USAGE = [USAGE_HEADER, USAGE_DATES, USAGE_INTS , USAGE_FLOAT, USAGE_NAMES, USAGE_DICE , USAGE_COIN , USAGE_CARD,
-              USAGE_EMAIL, USAGE_ADDR, USAGE_PHONE, USAGE_USER]
+              USAGE_EMAIL, USAGE_ADDR, USAGE_PHONE, USAGE_USER, USAGE_CUSTOM]
 
 
 def print_full_usage():
@@ -114,7 +114,7 @@ def vet_dates(args):
     try:
         return gen.gen_dates(quantity, args[1], year_start, year_end)
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print(print(f"Dates: {e}", file=sys.stderr))
         return -1
 
 def vet_ints(args):
@@ -142,7 +142,7 @@ def vet_ints(args):
     try:
         return gen.gen_ints(quantity, start, end)
     except gen.RangeError as e:
-        print(e, file=sys.stderr)
+        print(f"Ints: {e}", file=sys.stderr)
         return -1
 
 
@@ -182,7 +182,7 @@ def vet_floats(args):
     try:
         return gen.gen_floats(quantity, start, end, ndigits)
     except gen.RangeError as e:
-        print(e, file=sys.stderr)
+        print(f"Floats: {e}", file=sys.stderr)
         return -1
 
 
@@ -204,7 +204,7 @@ def vet_names(args):
     try:
         return gen.gen_names(quantity, args[1])
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print(f"Names: {e}", file=sys.stderr)
         return -1
 
 
@@ -307,7 +307,7 @@ def vet_emails(args):
     try:
         return gen.gen_emails(names)
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print(f"Emails: {e}", file=sys.stderr)
         return -1
 
 
@@ -328,9 +328,8 @@ def vet_addrs(args):
     try:
         return gen.gen_addrs(quantity, args[1])
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print(f"Addresses: {e}", file=sys.stderr)
         return -1
-
 
 
 def vet_phone(args):
@@ -386,7 +385,7 @@ def vet_user(args):
     try:
         return gen.gen_user_data(quantity, data, allow_dupes)
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print(f"User Data: {e}", file=sys.stderr)
         return -1
 
 
@@ -424,20 +423,25 @@ def vet_custom(args):
     args_lyst = [shlex.split(c) for c in cmds]
     # Get the results
     data = [parse_args(in_args, True) for in_args in args_lyst]
+
     if -1 in data:
         print(f"Issue on line {data.index(-1) + 1} in custom config file.", file=sys.stderr)
         return -1
     # Make all lists the same size
-    try:
-        data = [d[0:quantity] if len(d) >= quantity else -1 for d in data]
-    except TypeError:
-        print("Custom: All data sets must have the same size. Check config file.", file=sys.stderr)
-        return -1
+    for d in data:
+        if len(d) != quantity:
+            print("Custom: All data sets must have the same size. Check config file.", file=sys.stderr)
+            print(f"Issue on line {data.index(d) + 1} in custom config file", file=sys.stderr)
+            return -1
+
+    data = [d[0:quantity] if len(d) >= quantity else -1 for d in data]
+
     # Combine all the lists
     try:
         result = list(itertools.zip_longest(*data))
-    except TypeError as e:
-        print(e, file=sys.stderr)
+    except TypeError:
+        print(f"Custom: Cannot parse data", file=sys.stderr)
+        print(f"Issue on line {data.index(-1) + 1} in custom config file", file=sys.stderr)
         return -1
     out = []
     string = ""
@@ -474,7 +478,11 @@ def vet_read_file(args):
     else:
         delim = ','
     data = data.split(delim)
-    return data if data[-1] != "" else data.pop()
+    if data[-1] != "":
+        return data[0:quantity]
+    else:
+        data.pop()
+        return data[0:quantity]
 
 FUNCS = {'-d': vet_dates, '-i': vet_ints, '-f': vet_floats, '-n': vet_names, '-r': vet_dice, '-t': vet_coin,
          '-c': vet_card, '-e': vet_emails, '-a': vet_addrs, '-p': vet_phone, '-u': vet_user, '-o': vet_custom}

@@ -1,5 +1,5 @@
 import sys
-from cmd_line import parse_args
+from cmd_line import parse_args, print_full_usage
 
 
 def main():
