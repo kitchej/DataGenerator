@@ -61,6 +61,7 @@ If your input looks like this:
     dataGen.py -rf 10 "names.txt" "\n"
     dataGen.py -d 10 "%m/%d/%Y" 1990 1999
     dataGen.py -a 10 "street"
+    dataGen.py -e "names.txt" "\n"
 
 Then your output should look like this:
 
