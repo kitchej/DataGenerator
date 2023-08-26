@@ -6,6 +6,46 @@ Generates dummy data. Output is customizable.
 
     Python 3.xx
 
+### Usage:
+
+\<arg\> = required
+
+[arg] = optional
+
+{arg} = default value
+
+------------------------
+
+Show Usage: dataGen.py help
+
+Dates: ```dataGen.py -d \<quantity\> \<"format"\> [year_start: {1900}] [year_end: {2022}]```
+
+Ints: ```dataGen.py -i \<quantity\> \<range start\> \<range end\>```
+
+Floats: ```dataGen.py -f \<quantity\> \<range start\> \<range end\> [number of digits {1}]```
+
+Names: ```dataGen.py -n \<quantity\> \<option\>```
+
+    NAMES OPTIONS: "male", "female", "mixed", "surname", "fullmale", "fullfemale", "fullmixed"
+        
+Dice Rolls: ```dataGen.py -r \<quantity\> \<number of dice\>```
+
+Coin Tosses: ```dataGen.py -t \<quantity\>```
+
+Card Draws: ```dataGen.py -c \<quantity\> [number of decks: {1}] [discard drawn cards: {true}]```
+
+Emails: ```dataGen.py -e \<"file path to a bank of names"(should be in csv format)\> [csv delimiter: {', '}]```
+
+Addresses: ```dataGen.py -a \<quantity\> \<option\>```
+
+    ADDRESSES OPTIONS: "street", "full"
+        
+Phone numbers: ```dataGen.py -p \<quantity\>```
+
+User Data: ```dataGen.py n -u \<quantity\> \<"path to a data bank"(should be in csv format)\> \<allow duplicates\> [csv delimiter {','}]```
+
+Custom: ```dataGen.py -o <quantity> <\"path to config file\"> [output delimiter: ',']```
+
 ### Instructions for Custom
 
 The custom (-o) option requires a file containing the commands needed to generate your data.
@@ -84,44 +124,3 @@ Then your output should look like this:
   - All data banks that have been pre-generated must also be the same size as the other data banks.
 - Make sure to specify what delimiter you are using when reading in files. The program will attempt to read what ever you give it.
 - Output is printed directly to the console. Use the '>' operator to redirect it to a file.
-
-
-### Usage:
-
-\<arg\> = required
-
-[arg] = optional
-
-{arg} = default value
-
-------------------------
-
-Show Usage: dataGen.py help
-
-Dates: ```dataGen.py -d \<quantity\> \<"format"\> [year_start: {1900}] [year_end: {2022}]```
-
-Ints: ```dataGen.py -i \<quantity\> \<range start\> \<range end\>```
-
-Floats: ```dataGen.py -f \<quantity\> \<range start\> \<range end\> [number of digits {1}]```
-
-Names: ```dataGen.py -n \<quantity\> \<option\>```
-
-    NAMES OPTIONS: "male", "female", "mixed", "surname", "fullmale", "fullfemale", "fullmixed"
-        
-Dice Rolls: ```dataGen.py -r \<quantity\> \<number of dice\>```
-
-Coin Tosses: ```dataGen.py -t \<quantity\>```
-
-Card Draws: ```dataGen.py -c \<quantity\> [number of decks: {1}] [discard drawn cards: {true}]```
-
-Emails: ```dataGen.py -e \<"file path to a bank of names"(should be in csv format)\> [csv delimiter: {', '}]```
-
-Addresses: ```dataGen.py -a \<quantity\> \<option\>```
-
-    ADDRESSES OPTIONS: "street", "full"
-        
-Phone numbers: ```dataGen.py -p \<quantity\>```
-
-User Data: ```dataGen.py n -u \<quantity\> \<"path to a data bank"(should be in csv format)\> \<allow duplicates\> [csv delimiter {','}]```
-
-Custom: ```dataGen.py -o <quantity> <\"path to config file\"> [output delimiter: ',']```
