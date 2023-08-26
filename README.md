@@ -18,33 +18,33 @@ Generates dummy data. Output is customizable.
 
 Show Usage: dataGen.py help
 
-Dates: ```dataGen.py -d \<quantity\> \<"format"\> [year_start: {1900}] [year_end: {2022}]```
+Dates: ```dataGen.py -d <quantity> <"format"> [year_start: {1900}] [year_end: {2022}]```
 
-Ints: ```dataGen.py -i \<quantity\> \<range start\> \<range end\>```
+Ints: ```dataGen.py -i <quantity> <range start> <range end>```
 
-Floats: ```dataGen.py -f \<quantity\> \<range start\> \<range end\> [number of digits {1}]```
+Floats: ```dataGen.py -f <quantity\> <range start\> <range end> [number of digits {1}]```
 
-Names: ```dataGen.py -n \<quantity\> \<option\>```
+Names: ```dataGen.py -n <quantity> <option>```
 
     NAMES OPTIONS: "male", "female", "mixed", "surname", "fullmale", "fullfemale", "fullmixed"
         
-Dice Rolls: ```dataGen.py -r \<quantity\> \<number of dice\>```
+Dice Rolls: ```dataGen.py -r <quantity> <number of dice>```
 
-Coin Tosses: ```dataGen.py -t \<quantity\>```
+Coin Tosses: ```dataGen.py -t <quantity>```
 
-Card Draws: ```dataGen.py -c \<quantity\> [number of decks: {1}] [discard drawn cards: {true}]```
+Card Draws: ```dataGen.py -c <quantity> [number of decks: {1}] [discard drawn cards: {true}]```
 
-Emails: ```dataGen.py -e \<"file path to a bank of names"(should be in csv format)\> [csv delimiter: {', '}]```
+Emails: ```dataGen.py -e <"file path to a bank of names"(should be in csv format)> [csv delimiter: {', '}]```
 
-Addresses: ```dataGen.py -a \<quantity\> \<option\>```
+Addresses: ```dataGen.py -a <quantity> <option>```
 
     ADDRESSES OPTIONS: "street", "full"
         
-Phone numbers: ```dataGen.py -p \<quantity\>```
+Phone numbers: ```dataGen.py -p <quantity>```
 
-User Data: ```dataGen.py n -u \<quantity\> \<"path to a data bank"(should be in csv format)\> \<allow duplicates\> [csv delimiter {','}]```
+User Data: ```dataGen.py n -u <quantity> <"path to a data bank"(should be in csv format)> <allow duplicates> [csv delimiter {','}]```
 
-Custom: ```dataGen.py -o <quantity> <\"path to config file\"> [output delimiter: ',']```
+Custom: ```dataGen.py -o <quantity> <"path to config file"> [output delimiter: ',']```
 
 ### Instructions for Custom
 
@@ -81,7 +81,7 @@ This will work for most configurations, however, there is one special case. If y
 to match up with randomly generated names, you will need a special command line option:
 </p>
 
-    dataGen.py -rf \<quantity\> \<"Path to config file"\> ["delimiter": {','}]
+    dataGen.py -rf <quantity> <"Path to config file"> ["delimiter": {','}]
 
 Then follow these steps:
 
