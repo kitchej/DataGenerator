@@ -71,7 +71,6 @@ def parse_args(args, called_from_custom=False):
         out = FUNCS[args[1]](args[2:len(args)])
         if isinstance(out, int):
             sys.exit(-1)
-        # print(','.join(str(item) for item in out)) for true csv
         for i in out:
             print(i)
         sys.exit(0)
@@ -419,15 +418,12 @@ def vet_custom(args):
     if cmds[-1] == '':
         cmds.pop()
 
-    # Split the arguments as the shell would
     args_lyst = [shlex.split(c) for c in cmds]
-    # Get the results
     data = [parse_args(in_args, True) for in_args in args_lyst]
 
     if -1 in data:
         print(f"Issue on line {data.index(-1) + 1} in custom config file.", file=sys.stderr)
         return -1
-    # Make all lists the same size
     for d in data:
         if len(d) != quantity:
             print("Custom: All data sets must have the same size. Check config file.", file=sys.stderr)
@@ -435,8 +431,7 @@ def vet_custom(args):
             return -1
 
     data = [d[0:quantity] if len(d) >= quantity else -1 for d in data]
-
-    # Combine all the lists
+  
     try:
         result = list(itertools.zip_longest(*data))
     except TypeError:
