@@ -268,7 +268,7 @@ def vet_card(args):
             print("Card Draws: Invalid value for number of decks", file=sys.stderr)
             return -1
     else:
-        number_of_decks = 0
+        number_of_decks = 1
     if len(args) == 3:
         discard = args[2].lower()
         if discard == "true" or discard == "1":
