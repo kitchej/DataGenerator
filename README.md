@@ -5,15 +5,6 @@ Generates dummy data. Output is customizable.
 ### Requirements
 
     Python 3.xx
-
-### Usage:
-
-\<arg\> = required
-
-[arg] = optional
-
-{arg} = default value
-
 ------------------------
 
 Show Usage: dataGen.py help
